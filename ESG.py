@@ -5,10 +5,10 @@ import tweepy
 
 def get_api():
 	# get access tokens from environment variable
-	consumer_key = os.getenv("CONSUMER_KEY")
-	consumer_secret = os.getenv("CONSUMER_SECRET")
-	access_token = os.getenv("ACCESS_TOKEN")
-	access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
+	consumer_key = os.getenv("ESG_CONSUMER_KEY")
+	consumer_secret = os.getenv("ESG_CONSUMER_SECRET")
+	access_token = os.getenv("ESG_ACCESS_TOKEN")
+	access_token_secret = os.getenv("ESG_ACCESS_TOKEN_SECRET")
 
 	if (consumer_key is None
 		or consumer_secret is None
@@ -26,8 +26,8 @@ def get_api():
 
 def load_sciences():
 	''' read in list of sciences from file'''
-
-	scifile = open('list_of_sciences_wiki.txt','r',encoding='UTF-8')
+	fpath = os.path.join(__location__, 'list_of_sciences_wiki.txt')
+	scifile = open(fpath,'r',encoding='UTF-8')
 	sciences = []
 	for line in scifile:
 		lsplit = line.split(']] &ndash; ')
@@ -43,11 +43,15 @@ def process_adjectives():
 	''' convert scientific category dictionaries into file
 		of scientific adjectives + definitions'''
 
-	discs = os.listdir('./dict/')
-	adjfile = open('adjectives.txt','w',encoding='UTF-8')
+	dpath = os.path.join(__location__, 'dict')
+	discs = os.listdir(dpath)
+	apath = os.path.join(__location__, 'adjectives.txt')
+	adjfile = open(apath,'w',encoding='UTF-8')
+
 	for disc in discs:
 		# read in all terms for discpline
-		f = open('./dict/'+disc,'r')
+		fpath = os.path.join(__location__, 'dict', disc)
+		f = open(fpath,'r')
 		disc_terms = [json.loads(line) for line in f]
 		f.close()
 
@@ -67,7 +71,8 @@ def process_adjectives():
 def load_adjectives():
 	''' read in list of adjectives from file'''
 
-	adjfile = open('adjectives.txt','r',encoding='UTF-8')
+	fpath = os.path.join(__location__, 'adjectives.txt')
+	adjfile = open(fpath,'r',encoding='UTF-8')
 	adjectives = []
 	for line in adjfile:
 		lsplit = line.split('::')
@@ -79,7 +84,8 @@ def load_adjectives():
 def load_history():
 	''' read in pair history from file'''
 
-	fhist = open('history.txt','r',encoding='UTF-8')
+	fpath = os.path.join(__location__, 'history.txt')
+	fhist = open(fpath,'r',encoding='UTF-8')
 	history = [line.rstrip() for line in fhist]
 	fhist.close()
 	return history
@@ -87,7 +93,8 @@ def load_history():
 def save_history(history):
 	''' write pair history to file'''
 
-	fhist = open('history.txt','w',encoding='UTF-8')
+	fpath = os.path.join(__location__, 'history.txt')
+	fhist = open(fpath,'w',encoding='UTF-8')
 	for pair in history:
 		fhist.write(pair + '\n')
 	fhist.close()
@@ -95,7 +102,8 @@ def save_history(history):
 def load_pool():
 	''' read in pool from file'''
 
-	fpool = open('pool.txt','r',encoding='UTF-8')
+	fpath = os.path.join(__location__, 'pool.txt')
+	fpool = open(fpath,'r',encoding='UTF-8')
 	pool = []
 	for line in fpool:
 		lsplit = line.split('::')
@@ -106,7 +114,8 @@ def load_pool():
 def save_pool(pool):
 	''' write pool to file'''
 
-	fpool = open('pool.txt','w',encoding='UTF-8')
+	fpath = os.path.join(__location__, 'pool.txt')
+	fpool = open(fpath,'w',encoding='UTF-8')
 	for dat in pool:
 		fpool.write(dat[0] + '::' + dat[1] + '\n')
 	fpool.close()
@@ -154,6 +163,8 @@ def tweet(api):
 	save_pool(pool)
 
 if __name__ == '__main__':
+	__location__ = os.path.realpath(
+		os.path.join(os.getcwd(), os.path.dirname(__file__)))
 	api = get_api()
 	topup_pool()
 	tweet(api)
